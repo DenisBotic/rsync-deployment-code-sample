@@ -1,0 +1,55 @@
+name: PROJECT-NAME DEPLOYMENT - PRODUCTION
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+env:
+  SSH_HOST        : ${{ secrets.ssh_host }}
+  SSH_USERNAME    : ${{ secrets.ssh_username }}
+  SSH_PORT        : ${{ secrets.ssh_port }}
+  SSH_PRIVATE_KEY: ${{ secrets.ssh_private_key }}        # generate priv/pub keys without password
+  CODE_PATH       : ./                                   # ./path/to/your/code
+  DESTINATION_PATH: "public_html/rsync-deployment-test"  # Path to your project folder
+
+  # This will exclude existing files and folders on remote server to be deleted.
+  # For example:
+  #       If you upload the folder "uploads" by FTP and don't have it in your GitHub repository.
+  #       You need to protect it from being deleted on GitHub deploy action.
+  #       For that reason you would like to add that folder to EXCLUDE from being deleted on GitHub deployment.
+  # If you wish to add more exclude file/folder paths then you need to add $EXCLUDE_X to the rsync line of code (53).
+  EXCLUDE_1 : "wp-config.php"
+  EXCLUDE_2 : "wp-content/uploads"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up SSH key and known_hosts
+      run: |
+        mkdir -p ~/.ssh/
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -p $SSH_PORT -t rsa $SSH_HOST >> ~/.ssh/known_hosts
+
+
+    - name: Debug SSH Key and Known Hosts
+      run: |
+        cat ~/.ssh/id_rsa
+        cat ~/.ssh/known_hosts
+
+    - name: Test SSH Connection
+      run: ssh -i ~/.ssh/id_rsa -p $SSH_PORT $SSH_USERNAME@$SSH_HOST echo "SSH connection successful."
+
+
+    - name: Deploy code with rsync ( excluding wp-config.php )
+      run: |
+        # Add your deployment commands here...
+        # Use rsync to synchronize files to your server
+        rsync -e "ssh -i ~/.ssh/id_rsa -o 'StrictHostKeyChecking=no' -p $SSH_PORT -v" -r --delete-after --exclude=$EXCLUDE_1 --exclude=$EXCLUDE_2 $CODE_PATH $SSH_USERNAME@$SSH_HOST:$DESTINATION_PATH/
+
+    # Add additional steps as needed for your deployment process
