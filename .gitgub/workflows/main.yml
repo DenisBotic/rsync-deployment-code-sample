@@ -17,7 +17,7 @@ env:
   #       If you upload the folder "uploads" by FTP and don't have it in your GitHub repository.
   #       You need to protect it from being deleted on GitHub deploy action.
   #       For that reason you would like to add that folder to EXCLUDE from being deleted on GitHub deployment.
-  # If you wish to add more exclude file/folder paths then you also need to add $EXCLUDE_X to the rsync line of code (53).
+  # If you wish to add more exclude file/folder paths then you also need to add --exclude=$EXCLUDE_X to the rsync line of code (53).
   EXCLUDE_1 : "wp-config.php"
   EXCLUDE_2 : "wp-content/uploads"
 
