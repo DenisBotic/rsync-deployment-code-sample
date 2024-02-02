@@ -12,7 +12,7 @@ env:
   CODE_PATH       : ./                                   # ./path/to/your/code
   DESTINATION_PATH: "public_html/rsync-deployment-test"  # Path to your project folder
 
-  # This will exclude existing files and folders on remote server to be deleted.
+  # This will exclude existing files and folders on the remote server from being deleted.
   # For example:
   #       If you upload the folder "uploads" by FTP and don't have it in your GitHub repository.
   #       You need to protect it from being deleted on GitHub deploy action.
